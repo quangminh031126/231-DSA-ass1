@@ -21,7 +21,7 @@ public:
 	virtual void LIGHT(int num) = 0;
 
 public:
-	class customer
+	class customer // node
 	{
 	public:
 		string name;
