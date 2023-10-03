@@ -3,7 +3,11 @@
 class imp_res : public Restaurant
 {
 public:
-	imp_res(){};
+	customer *recent;
+	int count;
+	int cap;
+
+	imp_res() : recent(nullptr), count(0), cap(MAXSIZE){};
 
 	void RED(string name, int energy)
 	{
