@@ -3,43 +3,41 @@
 class imp_res : public Restaurant
 {
 private:
-	class cirCustomer : public customer
-	{
-	public:
-		cirCustomer(string na, int e, cirCustomer *p, cirCustomer *ne) : customer(na, e, p, ne) {}
-		cirCustomer(cirCustomer *p = NULL, cirCustomer *ne = NULL)
-		{
-			this->prev = p;
-			this->next = ne;
-		}
-		~cirCustomer()
-		{
-			// Unlinking the nodes before
-			if (this->next == this)
-			{
-				this->next = nullptr;
-				this->prev = nullptr;
-			}
-			else
-			{
-				this->prev->next = this->next;
-				this->next->prev = this->prev;
-
-				this->next = nullptr;
-				this->prev = nullptr;
-			}
-		}
-	};
-
-public:
-	cirCustomer *recent;
+	customer *recent;
 	int count;
 	int cap;
+	void init() {}
+	void removeAll() {}
 
+public:
 	imp_res() : recent(nullptr), count(0), cap(MAXSIZE){};
-	
-	void insert(const string& name, const int& energy){
-		
+
+	void moveToName(const string &name) {}
+	void moveToEnergy(const int &energy) {}
+	int length()
+	{
+		return count;
+	}
+	const string &getName() const
+	{
+		return recent->name;
+	}
+	const int &getEnergy() const
+	{
+		return recent->energy;
+	}
+	void setName(const string &newName)
+	{
+		this->recent->name = newName;
+	}
+	void setEnergy(const int &newEnergy)
+	{
+		this->recent->energy = newEnergy;
+	}
+
+	void insert(const string &name, const int &energy)
+	{
+		recent->next = recent->next->prev = new customer(name, energy, recent, recent->next);
 	}
 	void RED(string name, int energy)
 	{
