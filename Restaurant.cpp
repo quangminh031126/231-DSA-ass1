@@ -2,6 +2,18 @@
 
 class imp_res : public Restaurant
 {
+public:
+	class Customer : public Restaurant::customer
+	{
+		int timer;
+		Customer(string na, int e, customer *p, customer *ne, int t) : customer(na, e, p, ne), timer(t) {}
+		~Customer()
+		{
+			delete prev;
+			delete next;
+		}
+	};
+
 private:
 	customer *head;
 	customer *recent;
@@ -70,7 +82,7 @@ public:
 			insert(name, energy);
 		else
 		{
-			recent->prev = recent->prev->next = new customer(name,energy,recent->prev,recent);
+			recent->prev = recent->prev->next = new customer(name, energy, recent->prev, recent);
 			recent = recent->prev;
 		}
 	}
