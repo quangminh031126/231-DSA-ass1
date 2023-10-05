@@ -1,0 +1,238 @@
+Q: Let's say I have a circular doubly linked list, this list has a head pointer and a recent pointer. Each node has int value, int timer, string id. I want to remove all item that has value > 0, and then print the removed items with increasing timer order. How do I do that
+Q: You can not use vector and algorithm library, just iostream, string, math.h. You can instead create your own vector and algorithm library in this but it is not advised
+Q: You are not allowed to use array
+A:
+Here is a C++ code snippet that should do what you're asking for. This code assumes that you have a `Node` structure defined with `int value`, `int timer`, `string id`, and `Node* next`, `Node* prev` pointers. This also assumes that you have a `List` structure defined with `Node* head` and `Node* recent` pointers.
+
+```cpp
+#include <iostream>
+#include <string>
+#include <vector>
+#include <algorithm>
+
+using namespace std;
+
+struct Node {
+    int value;
+    int timer;
+    string id;
+    Node* next;
+    Node* prev;
+};
+
+struct List {
+    Node* head;
+    Node* recent;
+};
+
+void removeAndPrint(List* list) {
+    vector<Node*> removedNodes;
+
+    Node *ptr = list->head, *nextNode;
+
+    do {
+        nextNode = ptr->next;
+
+        if (ptr->value > 0) {
+            if (ptr->prev) ptr->prev->next = ptr->next;
+            if (ptr->next) ptr->next->prev = ptr->prev;
+
+            if (list->head == ptr) list->head = ptr->next;
+            if (list->recent == ptr) list->recent = ptr->prev;
+
+            removedNodes.push_back(ptr);
+        }
+
+        ptr = nextNode;
+
+    } while (ptr != list->head);
+
+    sort(removedNodes.begin(), removedNodes.end(), [](Node* a, Node* b) {
+        return a->timer < b->timer;
+    });
+
+    for (Node* node : removedNodes) {
+        cout << node->id << " " << node->value << " " << node->timer << endl;
+        delete node;  // assuming dynamic allocation
+    }
+}
+```
+
+This function `removeAndPrint` takes the list as input, removes all nodes with a value greater than 0, and prints the id, value, and timer of each removed node in increasing order of timer. The nodes are printed in the format "id value timer". After printing, the nodes are deleted assuming they were dynamically allocated.
+
+Please note that this code does not handle memory allocation or deallocation for the linked list nodes. You would need to implement that separately. Also, this code does not include any error checking or exception handling, so you might want to add that depending on your needs.
+A:
+Understood. Here's a version of the code that doesn't use the `vector` and `algorithm` libraries. This version uses a simple array to store the removed nodes and a bubble sort to sort them:
+
+```cpp
+#include <iostream>
+#include <string>
+#include <math.h>
+
+using namespace std;
+
+struct Node {
+    int value;
+    int timer;
+    string id;
+    Node* next;
+    Node* prev;
+};
+
+struct List {
+    Node* head;
+    Node* recent;
+};
+
+void removeAndPrint(List* list) {
+    Node* removedNodes[1000];  // assuming max 1000 nodes
+    int removedCount = 0;
+
+    Node *ptr = list->head, *nextNode;
+
+    do {
+        nextNode = ptr->next;
+
+        if (ptr->value > 0) {
+            if (ptr->prev) ptr->prev->next = ptr->next;
+            if (ptr->next) ptr->next->prev = ptr->prev;
+
+            if (list->head == ptr) list->head = ptr->next;
+            if (list->recent == ptr) list->recent = ptr->prev;
+
+            removedNodes[removedCount++] = ptr;
+        }
+
+        ptr = nextNode;
+
+    } while (ptr != list->head);
+
+    // Bubble sort
+    for (int i = 0; i < removedCount - 1; i++) {
+        for (int j = 0; j < removedCount - i - 1; j++) {
+            if (removedNodes[j]->timer > removedNodes[j + 1]->timer) {
+                Node* temp = removedNodes[j];
+                removedNodes[j] = removedNodes[j + 1];
+                removedNodes[j + 1] = temp;
+            }
+        }
+    }
+
+    for (int i = 0; i < removedCount; i++) {
+        cout << removedNodes[i]->id << " " << removedNodes[i]->value << " " << removedNodes[i]->timer << endl;
+        delete removedNodes[i];  // assuming dynamic allocation
+    }
+}
+```
+
+This function `removeAndPrint` takes the list as input, removes all nodes with a value greater than 0, and prints the id, value, and timer of each removed node in increasing order of timer. The nodes are printed in the format "id value timer". After printing, the nodes are deleted assuming they were dynamically allocated.
+
+Please note that this code does not handle memory allocation or deallocation for the linked list nodes. You would need to implement that separately. Also, this code does not include any error checking or exception handling, so you might want to add that depending on your needs.
+A:
+Understood. Here's a version of the code that doesn't use an array. This version uses a separate doubly linked list to store the removed nodes:
+
+```cpp
+#include <iostream>
+#include <string>
+#include <math.h>
+
+using namespace std;
+
+struct Node {
+    int value;
+    int timer;
+    string id;
+    Node* next;
+    Node* prev;
+};
+
+struct List {
+    Node* head;
+    Node* recent;
+};
+
+void removeAndPrint(List* list) {
+    List removedList;
+    removedList.head = NULL;
+    removedList.recent = NULL;
+
+    Node *ptr = list->head, *nextNode;
+
+    do {
+        nextNode = ptr->next;
+
+        if (ptr->value > 0) {
+            if (ptr->prev) ptr->prev->next = ptr->next;
+            if (ptr->next) ptr->next->prev = ptr->prev;
+
+            if (list->head == ptr) list->head = ptr->next;
+            if (list->recent == ptr) list->recent = ptr->prev;
+
+            // Add to removed list
+            if (removedList.head == NULL) {
+                removedList.head = ptr;
+                removedList.recent = ptr;
+                ptr->next = ptr;
+                ptr->prev = ptr;
+            } else {
+                Node *temp = removedList.head, *prevNode;
+
+                while (temp != removedList.recent && temp->timer < ptr->timer) {
+                    prevNode = temp;
+                    temp = temp->next;
+                }
+
+                if (temp == removedList.head && temp->timer >= ptr->timer) {
+                    // Insert at head
+                    ptr->next = removedList.head;
+                    ptr->prev = removedList.recent;
+                    removedList.head->prev = ptr;
+                    removedList.recent->next = ptr;
+                    removedList.head = ptr;
+                } else if (temp == removedList.recent && temp->timer < ptr->timer) {
+                    // Insert at tail
+                    ptr->next = removedList.head;
+                    ptr->prev = removedList.recent;
+                    removedList.head->prev = ptr;
+                    removedList.recent->next = ptr;
+                    removedList.recent = ptr;
+                } else {
+                    // Insert in middle
+                    prevNode->next = ptr;
+                    temp->prev = ptr;
+                    ptr->next = temp;
+                    ptr->prev = prevNode;
+                }
+            }
+        }
+
+        ptr = nextNode;
+
+    } while (ptr != list->head);
+
+    if (removedList.head == NULL) {
+        cout << "No nodes were removed." << endl;
+        return;
+    }
+
+    // Print and delete nodes
+    Node *tempNode, *delNode;
+
+    tempNode = removedList.head;
+
+    do {
+        delNode = tempNode;
+
+        cout << delNode->id << " " << delNode->value << " " << delNode->timer << endl;
+
+        tempNode = tempNode->next;
+
+        delete delNode;  // assuming dynamic allocation
+
+    } while (tempNode != removedList.head);
+}
+```
+
+This function `removeAndPrint` takes the list as input, removes all nodes with a value greater than 0, and prints the id, value, and timer of each removed node in increasing order of timer. The nodes are printed in the format "id value timer". After printing, the nodes are deleted assuming they were dynamically allocated.
+
+Please note that this code does not handle memory allocation or deallocation for the linked list nodes. You would need to implement that separately. Also, this code does not include any error checking or exception handling, so you might want to add that depending on your needs.
