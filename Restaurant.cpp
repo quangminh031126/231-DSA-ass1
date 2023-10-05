@@ -3,6 +3,7 @@
 class imp_res : public Restaurant
 {
 private:
+	customer *head;
 	customer *recent;
 	int count;
 	int cap;
@@ -10,7 +11,7 @@ private:
 	void removeAll() {}
 
 public:
-	imp_res() : recent(nullptr), count(0), cap(MAXSIZE){};
+	imp_res() : head(nullptr), recent(nullptr), count(0), cap(MAXSIZE){};
 
 	void moveToName(const string &name) {}
 	void moveToEnergy(const int &energy) {}
@@ -37,7 +38,41 @@ public:
 
 	void insert(const string &name, const int &energy)
 	{
-		recent->next = recent->next->prev = new customer(name, energy, recent, recent->next);
+		customer *newCustomer = new customer(name, energy, nullptr, nullptr);
+		if (!head)
+		{
+			head = newCustomer;
+			head->next = head->prev = recent;
+		}
+		else
+		{
+			newCustomer->next = head;
+			newCustomer->prev = head->prev;
+			head->prev->next = newCustomer;
+			head->prev = newCustomer;
+		}
+		recent = newCustomer;
+	}
+
+	void insertNext(const string &name, const int &energy)
+	{
+		if (recent == nullptr)
+			insert(name, energy);
+		else
+		{
+			recent->next = recent->next->prev = new customer(name, energy, recent, recent->next);
+			recent = recent->next;
+		}
+	}
+	void insertPrev(const string &name, const int &energy)
+	{
+		if (recent == nullptr)
+			insert(name, energy);
+		else
+		{
+			recent->prev = recent->prev->next = new customer(name,energy,recent->prev,recent);
+			recent = recent->prev;
+		}
 	}
 	void RED(string name, int energy)
 	{
