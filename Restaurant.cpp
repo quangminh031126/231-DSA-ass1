@@ -38,7 +38,7 @@ public:
 	int cap;
 	int timer;
 
-	imp_res() : head(recent), recent(nullptr), count(0), cap(MAXSIZE), timer(0){};
+	imp_res() : head(nullptr), recent(nullptr), count(0), cap(MAXSIZE), timer(0){};
 
 	void insert(const string &name, const int &energy)
 	{
@@ -57,8 +57,8 @@ public:
 		}
 		recent = newCustomer;
 	}
-	void insertPrev(const string &name, const int &energy) {
-
+	void insertPrev(const string &name, const int &energy)
+	{
 	}
 	void insertNext() {}
 	void remove() {}
