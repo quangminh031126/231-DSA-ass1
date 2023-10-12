@@ -39,11 +39,20 @@ public:
 	int timer;
 
 	imp_res() : head(nullptr), recent(nullptr), count(0), cap(MAXSIZE), timer(0){};
+	~imp_res()
+	{
+		// Yet to be implemented
+	}
 
-	void insert(const string &name, const int &energy)
+	bool isEmpty()
+	{
+		return count == 0 && head == nullptr;
+	}
+
+	void insert(const string &name, const int &energy) // Need to check cap before using
 	{
 		Customer *newCustomer = new Customer(name, energy, nullptr, nullptr, timer++);
-		if (!head)
+		if (!isEmpty())
 		{
 			head = newCustomer;
 			head->next = head->prev = head;
@@ -52,18 +61,72 @@ public:
 		{
 			newCustomer->next = head;
 			newCustomer->prev = head->prev;
-			head->prev->next = recent;
-			head->prev = recent;
+			head->prev->next = newCustomer;
+			head->prev = newCustomer;
 		}
 		recent = newCustomer;
+		++count;
 	}
-	void insertPrev(const string &name, const int &energy)
+	void insertPrev(const string &name, const int &energy) // Need to check cap before using
 	{
+		Customer *newCustomer = new Customer(name, energy, nullptr, nullptr, timer++);
+		if (!isEmpty())
+		{
+			head = newCustomer;
+			head->next = head->prev = head;
+		}
+		else
+		{
+			newCustomer->next = recent;
+			newCustomer->prev = recent->prev;
+			recent->prev->next = newCustomer;
+			recent->prev = newCustomer;
+		}
+		recent = newCustomer;
+		++count;
 	}
-	void insertNext() {}
-	void remove() {}
-	void removePrev() {}
-	void removeNext() {}
+	void insertNext(const string &name, const int &energy) // Need to check cap before using
+	{
+		Customer *newCustomer = new Customer(name, energy, nullptr, nullptr, timer++);
+		if (!isEmpty())
+		{
+			head = newCustomer;
+			head->next = head->prev = head;
+		}
+		else
+		{
+			newCustomer->next = recent->next;
+			newCustomer->prev = recent;
+			recent->next->prev = newCustomer;
+			recent->next = newCustomer;
+		}
+		recent = newCustomer;
+		++count;
+	}
+	void remove()
+	{
+		if (!isEmpty())
+		{
+			delete head->prev;
+			--count;
+		}
+	}
+	void removePrev()
+	{
+		if (!isEmpty())
+		{
+			delete recent->prev;
+			--count;
+		}
+	}
+	void removeNext()
+	{
+		if (!isEmpty())
+		{
+			delete recent->next;
+			--count;
+		}
+	}
 	void RED(string name, int energy)
 	{
 		cout << name << " " << energy << endl;
