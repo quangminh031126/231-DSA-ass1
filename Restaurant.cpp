@@ -3,16 +3,12 @@
 class imp_res : public Restaurant
 {
 private:
-	class cirCustomer : public customer
+	class Customer : public customer
 	{
 	public:
-		cirCustomer(string na, int e, cirCustomer *p, cirCustomer *ne) : customer(na, e, p, ne) {}
-		cirCustomer(cirCustomer *p = NULL, cirCustomer *ne = NULL)
-		{
-			this->prev = p;
-			this->next = ne;
-		}
-		~cirCustomer()
+		int timer;
+		Customer(string na, int e, customer *p, customer *ne, int t) : customer(na, e, p, ne), timer(t) {}
+		~Customer()
 		{
 			// Unlinking the nodes before
 			if (this->next == this)
@@ -29,18 +25,45 @@ private:
 				this->prev = nullptr;
 			}
 		}
+		int eDiff(customer *c)
+		{
+			return this->energy - c->energy;
+		}
 	};
 
 public:
-	cirCustomer *recent;
+	Customer *head;
+	Customer *recent;
 	int count;
 	int cap;
+	int timer;
 
-	imp_res() : recent(nullptr), count(0), cap(MAXSIZE){};
-	
-	void insert(const string& name, const int& energy){
-		
+	imp_res() : head(recent), recent(nullptr), count(0), cap(MAXSIZE), timer(0){};
+
+	void insert(const string &name, const int &energy)
+	{
+		Customer *newCustomer = new Customer(name, energy, nullptr, nullptr, timer++);
+		if (!head)
+		{
+			head = newCustomer;
+			head->next = head->prev = head;
+		}
+		else
+		{
+			newCustomer->next = head;
+			newCustomer->prev = head->prev;
+			head->prev->next = recent;
+			head->prev = recent;
+		}
+		recent = newCustomer;
 	}
+	void insertPrev(const string &name, const int &energy) {
+
+	}
+	void insertNext() {}
+	void remove() {}
+	void removePrev() {}
+	void removeNext() {}
 	void RED(string name, int energy)
 	{
 		cout << name << " " << energy << endl;
