@@ -25,10 +25,6 @@ private:
 				this->prev = nullptr;
 			}
 		}
-		int eDiff(customer *c)
-		{
-			return this->energy - c->energy;
-		}
 	};
 	class waitListQueue
 	{
@@ -188,8 +184,6 @@ public:
 	}
 	void RED(string name, int energy)
 	{
-		// cout << name << " " << energy << endl;
-		// customer *cus = new customer(name, energy, nullptr, nullptr);
 		if (energy == 0 || isNameHere(name))
 		{
 			return;
