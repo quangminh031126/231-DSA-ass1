@@ -32,11 +32,15 @@ private:
 		Customer *front;
 		Customer *rear;
 		int count;
-		waitListQueue()
+		waitListQueue() : front(nullptr), rear(nullptr), count(0) {}
+
+		~waitListQueue()
 		{
-			cout << "waitList constructor called";
+			while (!isEmpty())
+			{
+				removeFront();
+			}
 		}
-		~waitListQueue() {}
 		bool isEmpty()
 		{
 			return count == 0;
@@ -47,38 +51,84 @@ private:
 		}
 		void clear()
 		{
-			cout << "waitList clear called";
+			while (!isEmpty())
+			{
+				removeFront();
+			}
 		}
-		void insertRear()
+		void insertRear(const string &name, const int &energy, int &timer)
 		{
+			Customer *newCustomer = new Customer(name, energy, nullptr, nullptr, timer);
+			timer++;
+			if (isEmpty())
+			{
+				front = newCustomer;
+				front->next = front->prev = front;
+			}
+			else
+			{
+				newCustomer->prev = rear;
+				newCustomer->next = front;
+				rear->next = newCustomer;
+				front->prev = newCustomer;
+			}
+			rear = newCustomer;
+			this->count++;
 		}
-		void insertFront() {}
-		void removeRear() {}
-		void removeFront() {}
+		bool removeFront()
+		{
+			if (isEmpty())
+			{
+				return false;
+			}
+
+			Customer *temp = front;
+
+			if (front == rear)
+			{
+				front = rear = nullptr;
+			}
+			else
+			{
+				front = front->next;
+				front->prev = rear;
+				rear->next = front;
+			}
+			temp->next = nullptr;
+			temp->prev = nullptr;
+			delete temp;
+			count--;
+
+			return true;
+		}
 		void sortWaitList() {}
 	};
 
 public:
-	Customer *head;
 	Customer *recent;
 	waitListQueue *WL;
 	int count;
 	int timer;
 
-	imp_res() : head(nullptr), recent(nullptr), count(0), timer(0){};
+	imp_res() : recent(nullptr), count(0), timer(0){};
 	~imp_res()
 	{
 		// Yet to be implemented
+		while (!isEmpty())
+		{
+			removeHere();
+		}
+		delete WL;
 	}
 
 	bool isEmpty()
 	{
-		return count == 0 && head == nullptr;
+		return count == 0;
 	}
 
 	bool isNameInRes(const string &name)
 	{
-		if (!isEmpty())
+		if (isEmpty())
 			return false;
 		Customer *curr = head;
 		do
@@ -102,33 +152,14 @@ public:
 		return isNameInRes(name) && isNameInWL(name);
 	}
 
-	void insert(const string &name, const int &energy) // Need to check count before using
-	{
-		Customer *newCustomer = new Customer(name, energy, nullptr, nullptr, timer);
-		timer++;
-		if (!isEmpty())
-		{
-			head = newCustomer;
-			head->next = head->prev = head;
-		}
-		else
-		{
-			newCustomer->next = head;
-			newCustomer->prev = head->prev;
-			head->prev->next = newCustomer;
-			head->prev = newCustomer;
-		}
-		recent = newCustomer;
-		++count;
-	}
 	void insertPrev(const string &name, const int &energy) // Need to check count before using
 	{
 		Customer *newCustomer = new Customer(name, energy, nullptr, nullptr, timer);
 		timer++;
-		if (!isEmpty())
+		if (isEmpty())
 		{
-			head = newCustomer;
-			head->next = head->prev = head;
+			recent = newCustomer;
+			recent->next = recent->prev = recent;
 		}
 		else
 		{
@@ -136,18 +167,18 @@ public:
 			newCustomer->prev = recent->prev;
 			recent->prev->next = newCustomer;
 			recent->prev = newCustomer;
+			recent = newCustomer;
 		}
-		recent = newCustomer;
 		++count;
 	}
 	void insertNext(const string &name, const int &energy) // Need to check count before using
 	{
 		Customer *newCustomer = new Customer(name, energy, nullptr, nullptr, timer);
 		timer++;
-		if (!isEmpty())
+		if (isEmpty())
 		{
-			head = newCustomer;
-			head->next = head->prev = head;
+			recent = newCustomer;
+			recent->next = recent->prev = recent;
 		}
 		else
 		{
@@ -155,33 +186,99 @@ public:
 			newCustomer->prev = recent;
 			recent->next->prev = newCustomer;
 			recent->next = newCustomer;
+			recent = newCustomer;
 		}
-		recent = newCustomer;
 		++count;
 	}
-	void remove()
+	bool removeHere()
 	{
-		if (!isEmpty())
+		if (isEmpty())
 		{
-			delete head->prev;
-			--count;
+			return false;
 		}
+		Customer *temp = recent;
+		if (recent == temp)
+		{
+			recent = nullptr;
+		}
+		else
+		{
+			recent->next->prev = recent->prev;
+			recent->prev->next = recent->next;
+			if (temp->energy > 0)
+			{
+				recent = (Customer *)temp->next;
+			}
+			else
+			{
+				recent = (Customer *)temp->prev;
+			}
+		}
+		temp->next = nullptr;
+		temp->prev = nullptr;
+		delete temp;
+		count--;
+		return true;
 	}
-	void removePrev()
+	bool removePrev()
 	{
-		if (!isEmpty())
+		if (isEmpty())
 		{
-			delete recent->prev;
-			--count;
+			return false;
 		}
+		Customer *temp = (Customer *)recent->prev;
+		if (recent == temp)
+		{
+			recent = nullptr;
+		}
+		else
+		{
+			temp->prev->next = recent;
+			recent->prev = temp->prev;
+			if (temp->energy > 0)
+			{
+				recent = (Customer *)temp->next;
+			}
+			else
+			{
+				recent = (Customer *)temp->prev;
+			}
+		}
+		temp->next = nullptr;
+		temp->prev = nullptr;
+		delete temp;
+		count--;
+		return true;
 	}
-	void removeNext()
+	bool removeNext()
 	{
-		if (!isEmpty())
+		if (isEmpty())
 		{
-			delete recent->next;
-			--count;
+			return false;
 		}
+		Customer *temp = (Customer *)recent->next;
+		if (recent == temp)
+		{
+			recent = nullptr;
+		}
+		else
+		{
+			temp->next->prev = recent;
+			recent->next = temp->next;
+			if (temp->energy > 0)
+			{
+				recent = (Customer *)temp->next;
+			}
+			else
+			{
+				recent = (Customer *)temp->prev;
+			}
+		}
+		temp->next = nullptr;
+		temp->prev = nullptr;
+		delete temp;
+		count--;
+		return true;
 	}
 	void RED(string name, int energy)
 	{
@@ -239,7 +336,7 @@ public:
 		{
 			if (WL->count < MAXSIZE)
 			{
-				WL->insertRear();
+				WL->insertRear(name, energy, timer);
 			}
 			else
 			{
@@ -251,8 +348,24 @@ public:
 	{
 		cout << "blue " << num << endl;
 		// BLUE remove num customer
+		if (num <= 0)
+			return;
+		num = (num >= count) ? count : num;
+		for (int i = 0; i < num; i++)
+		{
+			int min_timer = recent->timer;
+			Customer *begin = recent;
+			Customer *curr = (Customer *)recent->next;
+			while (curr != begin)
+			{
+				if (min_timer > curr->timer)
+				{
+					min_timer = curr->timer;
+				}
+			}
 
-		// BLUE add num customer from waitList
+			// BLUE add num customer from waitList
+		}
 	}
 	void PURPLE()
 	{
