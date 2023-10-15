@@ -32,7 +32,6 @@ private:
 		Customer *front;
 		Customer *rear;
 		int count;
-		int cap;
 		waitListQueue()
 		{
 			cout << "waitList constructor called";
@@ -64,10 +63,9 @@ public:
 	Customer *recent;
 	waitListQueue *WL;
 	int count;
-	int cap;
 	int timer;
 
-	imp_res() : head(nullptr), recent(nullptr), count(0), cap(MAXSIZE), timer(0){};
+	imp_res() : head(nullptr), recent(nullptr), count(0), timer(0){};
 	~imp_res()
 	{
 		// Yet to be implemented
@@ -104,7 +102,7 @@ public:
 		return isNameInRes(name) && isNameInWL(name);
 	}
 
-	void insert(const string &name, const int &energy) // Need to check cap before using
+	void insert(const string &name, const int &energy) // Need to check count before using
 	{
 		Customer *newCustomer = new Customer(name, energy, nullptr, nullptr, timer++);
 		if (!isEmpty())
@@ -122,7 +120,7 @@ public:
 		recent = newCustomer;
 		++count;
 	}
-	void insertPrev(const string &name, const int &energy) // Need to check cap before using
+	void insertPrev(const string &name, const int &energy) // Need to check count before using
 	{
 		Customer *newCustomer = new Customer(name, energy, nullptr, nullptr, timer++);
 		if (!isEmpty())
@@ -140,7 +138,7 @@ public:
 		recent = newCustomer;
 		++count;
 	}
-	void insertNext(const string &name, const int &energy) // Need to check cap before using
+	void insertNext(const string &name, const int &energy) // Need to check count before using
 	{
 		Customer *newCustomer = new Customer(name, energy, nullptr, nullptr, timer++);
 		if (!isEmpty())
