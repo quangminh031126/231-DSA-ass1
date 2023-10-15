@@ -90,7 +90,7 @@ private:
 			}
 			else
 			{
-				front = front->next;
+				front = (Customer *)front->next;
 				front->prev = rear;
 				rear->next = front;
 			}
