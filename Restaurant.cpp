@@ -101,6 +101,26 @@ private:
 
 			return true;
 		}
+		bool isNameInWaitList(const string &name)
+		{
+			if (isEmpty())
+			{
+				return false;
+			}
+
+			Customer *curr = front;
+			do
+			{
+				if (curr->name == name)
+				{
+					return true;
+				}
+				curr = (Customer *)curr->next;
+			} while (curr != front);
+
+			return false;
+		}
+
 		void sortWaitList() {}
 	};
 
@@ -130,7 +150,8 @@ public:
 	{
 		if (isEmpty())
 			return false;
-		Customer *curr = head;
+		Customer *curr = recent;
+		Customer *begin = recent;
 		do
 		{
 			if (curr->name == name)
@@ -139,12 +160,13 @@ public:
 			}
 			// end of loop
 			curr = (Customer *)curr->next;
-		} while (curr != head);
+		} while (curr != begin);
 		return false;
 	}
 
 	bool isNameInWL(const string &name)
 	{
+		return WL->isNameInWaitList(name);
 	}
 
 	bool isNameHere(const string &name)
