@@ -104,7 +104,8 @@ public:
 
 	void insert(const string &name, const int &energy) // Need to check count before using
 	{
-		Customer *newCustomer = new Customer(name, energy, nullptr, nullptr, timer++);
+		Customer *newCustomer = new Customer(name, energy, nullptr, nullptr, timer);
+		timer++;
 		if (!isEmpty())
 		{
 			head = newCustomer;
@@ -122,7 +123,8 @@ public:
 	}
 	void insertPrev(const string &name, const int &energy) // Need to check count before using
 	{
-		Customer *newCustomer = new Customer(name, energy, nullptr, nullptr, timer++);
+		Customer *newCustomer = new Customer(name, energy, nullptr, nullptr, timer);
+		timer++;
 		if (!isEmpty())
 		{
 			head = newCustomer;
@@ -140,7 +142,8 @@ public:
 	}
 	void insertNext(const string &name, const int &energy) // Need to check count before using
 	{
-		Customer *newCustomer = new Customer(name, energy, nullptr, nullptr, timer++);
+		Customer *newCustomer = new Customer(name, energy, nullptr, nullptr, timer);
+		timer++;
 		if (!isEmpty())
 		{
 			head = newCustomer;
@@ -247,6 +250,9 @@ public:
 	void BLUE(int num)
 	{
 		cout << "blue " << num << endl;
+		// BLUE remove num customer
+
+		// BLUE add num customer from waitList
 	}
 	void PURPLE()
 	{
