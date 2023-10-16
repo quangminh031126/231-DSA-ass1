@@ -8,23 +8,7 @@ private:
 	public:
 		int timer;
 		Customer(string na, int e, customer *p, customer *ne, int t) : customer(na, e, p, ne), timer(t) {}
-		~Customer()
-		{
-			// Unlinking the nodes before
-			if (this->next == this)
-			{
-				this->next = nullptr;
-				this->prev = nullptr;
-			}
-			else
-			{
-				this->prev->next = this->next;
-				this->next->prev = this->prev;
-
-				this->next = nullptr;
-				this->prev = nullptr;
-			}
-		}
+		~Customer() {}
 	};
 	class waitListQueue
 	{
@@ -171,7 +155,7 @@ public:
 
 	bool isNameHere(const string &name)
 	{
-		return isNameInRes(name) && isNameInWL(name);
+		return isNameInRes(name) || isNameInWL(name);
 	}
 
 	void insertPrev(const string &name, const int &energy) // Need to check count before using
