@@ -125,6 +125,19 @@ public:
 		delete WL;
 	}
 
+	void clearRes()
+	{
+		while (!isEmpty())
+		{
+			removeHere();
+		}
+	}
+	void clear()
+	{
+		clearRes();
+		WL->clear();
+	}
+
 	bool isEmpty()
 	{
 		return count == 0;
@@ -350,27 +363,51 @@ public:
 			}
 		}
 	}
-	void BLUE(int num)
+	void removeSmallestTimer()
 	{
-		cout << "blue " << num << endl;
+		if (isEmpty())
+		{
+			return;
+		}
+
+		Customer *smallestTimerCustomer = recent;
+		Customer *curr = (Customer *)recent->next;
+
+		// Find the customer with the smallest timer
+		do
+		{
+			if (curr->timer < smallestTimerCustomer->timer)
+			{
+				smallestTimerCustomer = curr;
+			}
+			curr = (Customer *)curr->next;
+		} while (curr != recent);
+
+		// Set recent to the customer with the smallest timer
+		recent = smallestTimerCustomer;
+
+		// Remove the customer with the smallest timer
+		removeHere();
+	}
+	void BLUE(int num) // Kick num customer out of restaurant
+	{
 		// BLUE remove num customer
 		if (num <= 0)
 			return;
-		num = (num >= count) ? count : num;
+		if (num >= count)
+		{
+			clearRes();
+		}
 		for (int i = 0; i < num; i++)
 		{
-			int min_timer = recent->timer;
-			Customer *begin = recent;
-			Customer *curr = (Customer *)recent->next;
-			while (curr != begin)
-			{
-				if (min_timer > curr->timer)
-				{
-					min_timer = curr->timer;
-				}
-			}
+			removeSmallestTimer();
+		}
 
-			// BLUE add num customer from waitList
+		// BLUE add customer from waitList to Restaurant
+		while (count != MAXSIZE || WL->isEmpty())
+		{
+			RED(WL->front->name, WL->front->energy);
+			WL->removeFront();
 		}
 	}
 	void PURPLE()
