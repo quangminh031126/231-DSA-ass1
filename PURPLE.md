@@ -202,3 +202,94 @@ void setCustomer(int index, Customer *customer) {
 This code first finds the customer with the highest absolute energy value. If there are multiple customers with the same energy value, it selects the one with the lower timer. Then it sorts the customers using Shell Sort. Finally, it moves the customer with the highest energy value to the front of the queue.
 
 Please note that this code assumes that all `timer` values are unique and that `count` represents the number of customers in the queue. Also, this code modifies the queue in place. If you don’t want to modify the original queue, you should create a copy of it before sorting.
+
+A:
+
+Yes, you’re correct. The `setCustomer` function in the previous code is used to replace the customer at a specific index with another customer. However, it’s not exactly swapping two customers, but rather replacing one with another.
+
+If you want to swap two customers using pointer manipulation only, you can do so by adjusting the `next` and `prev` pointers of the customers and their neighbors. Here’s a helper function that does that:
+
+```cpp
+void swapCustomers(Customer *a, Customer *b) {
+    if (a == b) {
+        return;
+    }
+
+    // Detach a and b from their current positions
+    a->prev->next = a->next;
+    a->next->prev = a->prev;
+    b->prev->next = b->next;
+    b->next->prev = b->prev;
+
+    // Swap a and b
+    Customer *temp = a;
+    a = b;
+    b = temp;
+
+    // Attach a and b at their new positions
+    a->prev->next = a;
+    a->next->prev = a;
+    b->prev->next = b;
+    b->next->prev = b;
+
+    // Update front and rear if necessary
+    if (front == temp) {
+        front = a;
+    } else if (front == a) {
+        front = temp;
+    }
+    if (rear == temp) {
+        rear = a;
+    } else if (rear == a) {
+        rear = temp;
+    }
+}
+```
+
+This function first detaches customers `a` and `b` from their current positions in the queue. Then it swaps `a` and `b`. Finally, it attaches `a` and `b` at their new positions. If `a` or `b` was at the front or rear of the queue, it updates the `front` and `rear` pointers accordingly.
+
+Please note that this function assumes that `a` and `b` are not `nullptr` and that they are different customers in the same queue. If these assumptions are not met, the function may not work correctly.
+
+A:
+
+Sure, here’s how you can implement the `sortWaitList()` function using the `swapCustomers` function:
+
+```cpp
+void sortWaitList() {
+    if (isEmpty()) {
+        return;
+    }
+
+    // Step 1: Find the customer with the highest absolute value of energy
+    Customer *maxEnergyCustomer = front;
+    Customer *curr = (Customer *)front->next;
+    do {
+        if (abs(curr->energy) > abs(maxEnergyCustomer->energy) ||
+            (abs(curr->energy) == abs(maxEnergyCustomer->energy) && curr->timer < maxEnergyCustomer->timer)) {
+            maxEnergyCustomer = curr;
+        }
+        curr = (Customer *)curr->next;
+    } while (curr != front);
+
+    // Step 2: Shell Sort
+    for (int gap = count / 2; gap > 0; gap /= 2) {
+        for (int i = gap; i < count; i++) {
+            Customer *temp = getCustomer(i);
+            int j;
+            for (j = i; j >= gap && compareCustomers(getCustomer(j - gap), temp); j -= gap) {
+                swapCustomers(getCustomer(j), getCustomer(j - gap));
+            }
+            swapCustomers(getCustomer(j), temp);
+        }
+    }
+
+    // Move maxEnergyCustomer to front
+    if (maxEnergyCustomer != front) {
+        swapCustomers(maxEnergyCustomer, front);
+    }
+}
+```
+
+This code first finds the customer with the highest absolute energy value. If there are multiple customers with the same energy value, it selects the one with the lower timer. Then it sorts the customers using Shell Sort. Finally, it moves the customer with the highest energy value to the front of the queue.
+
+Please note that this code assumes that all `timer` values are unique and that `count` represents the number of customers in the queue. Also, this code modifies the queue in place. If you don’t want to modify the original queue, you should create a copy of it before sorting.
