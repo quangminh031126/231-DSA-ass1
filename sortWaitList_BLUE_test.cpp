@@ -240,6 +240,24 @@ public:
         }
         return curr;
     }
+    void printQueue()
+    {
+        if (isEmpty())
+        {
+            cout << "Queue is empty" << endl;
+        }
+        else
+        {
+            Customer *curr = front;
+            do
+            {
+                cout << curr->name << " ";
+                curr = (Customer *)curr->next;
+            } while (curr != front);
+            cout << endl;
+        }
+    }
+
     void insSort(Customer *start, int n, int incr)
     {
         Customer *iCustomer = advance(start, incr);
@@ -250,6 +268,7 @@ public:
             while (jCustomer != start && compareCustomer(jPrevCustomer, jCustomer))
             {
                 swapCustomers(jPrevCustomer, jCustomer);
+                printQueue();
                 jCustomer = jPrevCustomer;
                 if (jPrevCustomer != start)
                     jPrevCustomer = advance(jCustomer, -incr);
