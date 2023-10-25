@@ -4,3 +4,4 @@ sortWaitList_BLUE_test
 .vscode/
 Restaurant
 trashbin.cpp
+.gitignore
