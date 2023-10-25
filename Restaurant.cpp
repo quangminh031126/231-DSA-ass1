@@ -252,7 +252,7 @@ private:
 			}
 			insSort(start, n, 1);
 		}
-		void sortWaitList_BLUE()
+		void sortWaitList_PURPLE()
 		{
 			Customer *maxEnergyCustomer = getMaxEnergyCustomer();
 			int position = getPosition(maxEnergyCustomer);
