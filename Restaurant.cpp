@@ -3,11 +3,15 @@
 class imp_res : public Restaurant
 {
 private:
-	class Customer : public customer
+	class Customer
 	{
 	public:
+		string name;
+		int energy;
 		int timer;
-		Customer(string na, int e, customer *p, customer *ne, int t) : customer(na, e, p, ne), timer(t) {}
+		Customer *next;
+		Customer *prev;
+		Customer(string na, int e, Customer *p, Customer *ne, int t) : name(na), energy(e), prev(p), next(ne), timer(t) {}
 		~Customer() {}
 	};
 	class waitListQueue
@@ -40,6 +44,22 @@ private:
 				removeFront();
 			}
 		}
+		void printWaitList()
+		{
+			if (front == nullptr)
+			{
+				cout << "Wait list is empty." << endl;
+				return;
+			}
+
+			Customer *temp = front;
+			do
+			{
+				cout << temp->name << "-" << temp->energy << "\n";
+				temp = temp->next;
+			} while (temp != front);
+		}
+
 		void insertRear(const string &name, const int &energy, int &timer)
 		{
 			Customer *newCustomer = new Customer(name, energy, nullptr, nullptr, timer);
@@ -74,7 +94,7 @@ private:
 			}
 			else
 			{
-				front = (Customer *)front->next;
+				front = front->next;
 				front->prev = rear;
 				rear->next = front;
 			}
@@ -99,7 +119,7 @@ private:
 				{
 					return true;
 				}
-				curr = (Customer *)curr->next;
+				curr = curr->next;
 			} while (curr != front);
 
 			return false;
@@ -110,10 +130,10 @@ private:
 			{
 				return;
 			}
-			Customer *prevA = (Customer *)a->prev;
-			Customer *nextA = (Customer *)a->next;
-			Customer *prevB = (Customer *)b->prev;
-			Customer *nextB = (Customer *)b->next;
+			Customer *prevA = a->prev;
+			Customer *nextA = a->next;
+			Customer *prevB = b->prev;
+			Customer *nextB = b->next;
 
 			if (nextA == b)
 			{
@@ -178,7 +198,7 @@ private:
 				{
 					return position;
 				}
-				curr = (Customer *)curr->next;
+				curr = curr->next;
 				position++;
 			} while (curr != front);
 
@@ -191,7 +211,7 @@ private:
 				return nullptr;
 			}
 			Customer *maxEnergyCustomer = front;
-			Customer *curr = (Customer *)front->next;
+			Customer *curr = front->next;
 			do
 			{
 				if (abs(curr->energy) > abs(maxEnergyCustomer->energy) ||
@@ -199,7 +219,7 @@ private:
 				{
 					maxEnergyCustomer = curr;
 				}
-				curr = (Customer *)curr->next;
+				curr = curr->next;
 			} while (curr != front);
 			return maxEnergyCustomer;
 		}
@@ -210,14 +230,14 @@ private:
 			{
 				for (int i = 0; i < n; i++)
 				{
-					curr = (Customer *)curr->next;
+					curr = curr->next;
 				}
 			}
 			else
 			{
 				for (int i = 0; i < -n; i++)
 				{
-					curr = (Customer *)curr->prev;
+					curr = curr->prev;
 				}
 			}
 			return curr;
@@ -247,7 +267,7 @@ private:
 				for (int j = 0; j < i; j++)
 				{
 					insSort(sublistStart, n - j, i);
-					sublistStart = (Customer *)sublistStart->next;
+					sublistStart = sublistStart->next;
 				}
 			}
 			insSort(start, n, 1);
@@ -266,7 +286,10 @@ public:
 	int count;
 	int timer;
 
-	imp_res() : recent(nullptr), count(0), timer(0){};
+	imp_res() : recent(nullptr), count(0), timer(0)
+	{
+		WL = new waitListQueue();
+	};
 	~imp_res()
 	{
 		// Yet to be implemented
@@ -308,7 +331,7 @@ public:
 				return true;
 			}
 			// end of loop
-			curr = (Customer *)curr->next;
+			curr = curr->next;
 		} while (curr != begin);
 		return false;
 	}
@@ -368,7 +391,7 @@ public:
 			return false;
 		}
 		Customer *temp = recent;
-		if (recent == temp)
+		if (recent->next == recent)
 		{
 			recent = nullptr;
 		}
@@ -378,71 +401,11 @@ public:
 			recent->prev->next = recent->next;
 			if (temp->energy > 0)
 			{
-				recent = (Customer *)temp->next;
+				recent = temp->next;
 			}
 			else
 			{
-				recent = (Customer *)temp->prev;
-			}
-		}
-		temp->next = nullptr;
-		temp->prev = nullptr;
-		delete temp;
-		count--;
-		return true;
-	}
-	bool removePrev()
-	{
-		if (isEmpty())
-		{
-			return false;
-		}
-		Customer *temp = (Customer *)recent->prev;
-		if (recent == temp)
-		{
-			recent = nullptr;
-		}
-		else
-		{
-			temp->prev->next = recent;
-			recent->prev = temp->prev;
-			if (temp->energy > 0)
-			{
-				recent = (Customer *)temp->next;
-			}
-			else
-			{
-				recent = (Customer *)temp->prev;
-			}
-		}
-		temp->next = nullptr;
-		temp->prev = nullptr;
-		delete temp;
-		count--;
-		return true;
-	}
-	bool removeNext()
-	{
-		if (isEmpty())
-		{
-			return false;
-		}
-		Customer *temp = (Customer *)recent->next;
-		if (recent == temp)
-		{
-			recent = nullptr;
-		}
-		else
-		{
-			temp->next->prev = recent;
-			recent->next = temp->next;
-			if (temp->energy > 0)
-			{
-				recent = (Customer *)temp->next;
-			}
-			else
-			{
-				recent = (Customer *)temp->prev;
+				recent = temp->prev;
 			}
 		}
 		temp->next = nullptr;
@@ -464,7 +427,12 @@ public:
 				 << "\n";
 			return;
 		}
-		if (0 <= count && count < MAXSIZE_2)
+		if (count == 0)
+		{
+			insertNext(name, energy);
+			return;
+		}
+		if (0 < count && count < MAXSIZE_2)
 		{
 			if (energy >= recent->energy)
 			{
@@ -481,7 +449,7 @@ public:
 			int curr_diff = 0;
 			Customer *begin = recent;
 			Customer *curr = recent;
-			do
+			do // find max diff
 			{
 				// do this during each loop
 				curr_diff = energy - curr->energy;
@@ -491,7 +459,7 @@ public:
 					max_diff = curr_diff;
 				}
 				// end of each loop
-				curr = (Customer *)curr->next;
+				curr = curr->next;
 			} while (curr != begin);
 
 			if (curr_diff < 0)
@@ -523,7 +491,7 @@ public:
 		}
 
 		Customer *smallestTimerCustomer = recent;
-		Customer *curr = (Customer *)recent->next;
+		Customer *curr = recent->next;
 
 		// Find the customer with the smallest timer
 		do
@@ -532,7 +500,7 @@ public:
 			{
 				smallestTimerCustomer = curr;
 			}
-			curr = (Customer *)curr->next;
+			curr = curr->next;
 		} while (curr != recent);
 
 		// Set recent to the customer with the smallest timer
@@ -550,13 +518,14 @@ public:
 		{
 			clearRes();
 		}
-		for (int i = 0; i < num; i++)
-		{
-			removeSmallestTimer();
-		}
+		else
+			for (int i = 0; i < num; i++)
+			{
+				removeSmallestTimer();
+			}
 
 		// BLUE add customer from waitList to Restaurant
-		while (count != MAXSIZE || WL->isEmpty())
+		while (count != MAXSIZE && !WL->isEmpty())
 		{
 			RED(WL->front->name, WL->front->energy);
 			WL->removeFront();
@@ -580,6 +549,32 @@ public:
 	}
 	void LIGHT(int num)
 	{
-		cout << "light " << num << endl;
+		if (num == 0)
+		{
+			WL->printWaitList();
+		}
+		else if (recent != nullptr) // Check if recent is not null
+		{
+			Customer *curr = recent;
+			Customer *begin = recent;
+			if (num > 0)
+			{
+				do
+				{
+					cout << curr->name << "-" << curr->energy << "\n";
+					// end of loop
+					curr = curr->next;
+				} while (curr != begin);
+			}
+			else if (num < 0)
+			{
+				do
+				{
+					cout << curr->name << "-" << curr->energy << "\n";
+					// end of loop
+					curr = curr->prev;
+				} while (curr != begin);
+			}
+		}
 	}
 };

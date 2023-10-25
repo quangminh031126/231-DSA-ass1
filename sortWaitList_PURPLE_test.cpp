@@ -4,28 +4,15 @@
 #include <cassert>
 
 using namespace std;
-class customer // node
+class Customer
 {
 public:
     string name;
     int energy;
-    customer *prev;
-    customer *next;
-
-public:
-    customer() {}
-    customer(string na, int e, customer *p, customer *ne) : name(na), energy(e), prev(p), next(ne) {}
-    ~customer() {}
-    void print()
-    {
-        cout << name << "-" << energy << endl;
-    }
-};
-class Customer : public customer
-{
-public:
     int timer;
-    Customer(string na, int e, customer *p, customer *ne, int t) : customer(na, e, p, ne), timer(t) {}
+    Customer *next;
+    Customer *prev;
+    Customer(string na, int e, Customer *p, Customer *ne, int t) : name(na), energy(e), prev(p), next(ne), timer(t) {}
     ~Customer() {}
 };
 class waitListQueue
@@ -92,7 +79,7 @@ public:
         }
         else
         {
-            front = (Customer *)front->next;
+            front = front->next;
             front->prev = rear;
             rear->next = front;
         }
@@ -117,7 +104,7 @@ public:
             {
                 return true;
             }
-            curr = (Customer *)curr->next;
+            curr = curr->next;
         } while (curr != front);
 
         return false;
@@ -128,10 +115,10 @@ public:
         {
             return;
         }
-        Customer *prevA = (Customer *)a->prev;
-        Customer *nextA = (Customer *)a->next;
-        Customer *prevB = (Customer *)b->prev;
-        Customer *nextB = (Customer *)b->next;
+        Customer *prevA = a->prev;
+        Customer *nextA = a->next;
+        Customer *prevB = b->prev;
+        Customer *nextB = b->next;
 
         if (nextA == b)
         {
@@ -196,7 +183,7 @@ public:
             {
                 return position;
             }
-            curr = (Customer *)curr->next;
+            curr = curr->next;
             position++;
         } while (curr != front);
 
@@ -209,7 +196,7 @@ public:
             return nullptr;
         }
         Customer *maxEnergyCustomer = front;
-        Customer *curr = (Customer *)front->next;
+        Customer *curr = front->next;
         do
         {
             if (abs(curr->energy) > abs(maxEnergyCustomer->energy) ||
@@ -217,7 +204,7 @@ public:
             {
                 maxEnergyCustomer = curr;
             }
-            curr = (Customer *)curr->next;
+            curr = curr->next;
         } while (curr != front);
         return maxEnergyCustomer;
     }
@@ -228,14 +215,14 @@ public:
         {
             for (int i = 0; i < n; i++)
             {
-                curr = (Customer *)curr->next;
+                curr = curr->next;
             }
         }
         else
         {
             for (int i = 0; i < -n; i++)
             {
-                curr = (Customer *)curr->prev;
+                curr = curr->prev;
             }
         }
         return curr;
@@ -252,7 +239,7 @@ public:
             do
             {
                 cout << curr->name << " ";
-                curr = (Customer *)curr->next;
+                curr = curr->next;
             } while (curr != front);
             cout << endl;
         }
@@ -284,7 +271,7 @@ public:
             for (int j = 0; j < i; j++)
             {
                 insSort(sublistStart, n - j, i);
-                sublistStart = (Customer *)sublistStart->next;
+                sublistStart = sublistStart->next;
             }
         }
         insSort(start, n, 1);
